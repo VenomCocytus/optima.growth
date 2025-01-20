@@ -1,0 +1,14 @@
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+
+  application:
+    name: Licensing-service
+
+  data:
+    mongodb:
+      uri: mongodb://root:password@localhost:27017/licensing-service?authSource=admin
+
+server:
+  port: 8081
