@@ -86,7 +86,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ProblemDetail handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
+    public ProblemDetail handleHttpRequestMethodNotSupportedException(Exception exception) {
 
         return problemBuilder
                 .buildGenericProblemDetail(
