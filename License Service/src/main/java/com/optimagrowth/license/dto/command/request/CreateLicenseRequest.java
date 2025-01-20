@@ -4,6 +4,7 @@ import com.optimagrowth.license.define.LicenseType;
 import com.optimagrowth.license.validation.annotation.LicenseIdNotAlreadyExists;
 import com.optimagrowth.license.validation.annotation.ProductNameNotAlreadyExists;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -22,8 +23,7 @@ public record CreateLicenseRequest(
         @Size(min = 3, max = 50, message = "{message.license.product.name.size.alert}")
         String productName,
 
-        @NotBlank(message = "{message.license.type.blank}")
-        @Pattern(regexp = "FULL|PARTIAL" ,message = "{message.license.type.not.valid.alert}")
+        @NotNull(message = "{message.license.type.null}")
         LicenseType licenseType
 ) {
 }

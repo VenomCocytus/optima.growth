@@ -18,7 +18,7 @@ public class ProblemBuilder {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    @Value("${server.port")
+    @Value("${server.port}")
     private String serverPort;
 
     private final static String DETAIL = "detail";
@@ -30,7 +30,7 @@ public class ProblemBuilder {
     private ProblemDetail createProblemDetail(String title, String detail, HttpStatus httpStatus, String errorCategory) {
 
         String errorUri = String.format(
-                "https://%s:%s/errors/%s", applicationName, serverPort, httpStatus.name());
+                "https://%s:%s/errors/%s", applicationName, serverPort, httpStatus.name().toLowerCase());
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, detail);
         problemDetail.setType(URI.create(errorUri));

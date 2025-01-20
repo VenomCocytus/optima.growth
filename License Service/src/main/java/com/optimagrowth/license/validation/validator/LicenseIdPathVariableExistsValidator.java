@@ -2,13 +2,14 @@ package com.optimagrowth.license.validation.validator;
 
 import com.optimagrowth.license.repository.LicenseRepository;
 import com.optimagrowth.license.validation.annotation.LicenseIdNotAlreadyExists;
+import com.optimagrowth.license.validation.annotation.LicenseIdPathVariableExists;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
-public class LicenseIdPathVariableExistsValidator implements ConstraintValidator<LicenseIdNotAlreadyExists, String> {
+public class LicenseIdPathVariableExistsValidator implements ConstraintValidator<LicenseIdPathVariableExists, String> {
 
     private final LicenseRepository licenseRepository;
 

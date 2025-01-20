@@ -14,10 +14,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.optimagrowth.commonlibrary.utils.utils.Utils.translate;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/organization/{organizationId}/license")
@@ -25,7 +27,7 @@ public class LicenseCommandController {
 
     private final LicenseCommandService licenseCommandService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<GenericResponse<CreateLicenseResponse>> createLicense(
             @Valid
             @RequestBody

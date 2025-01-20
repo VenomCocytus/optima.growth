@@ -2,6 +2,7 @@ package com.optimagrowth.license.model;
 
 import com.optimagrowth.license.define.LicenseType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -35,7 +36,6 @@ public class License extends BaseModel{
     @Size(min = 3, max = 50, message = "{message.license.product.name.size.alert}")
     private String productName;
 
-    @NotBlank(message = "{message.license.type.blank}")
-    @Pattern(regexp = "FULL|PARTIAL", message = "{message.license.type.not.valid.alert}")
+    @NotNull(message = "{message.license.type.null}")
     private LicenseType licenseType;
 }

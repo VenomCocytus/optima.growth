@@ -3,7 +3,7 @@ package com.optimagrowth.license;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "com.optimagrowth.commonlibrary")
+@SpringBootApplication(scanBasePackages = "com.optimagrowth")
 public class LicenseServiceApplication {
 
     public static void main(String[] args) {

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,8 +29,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-//public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ProblemBuilder problemBuilder;
 
@@ -67,6 +67,15 @@ public class GlobalExceptionHandler {
                         getStackTraceAsString(exception), exception.getMessage(), INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+
+        return problemBuilder
+                .buildRuntimeProblemDetail(
+                        exception.getMessage(), BAD_REQUEST);
+    }
+
     @ExceptionHandler(ServletRequestBindingException.class)
     @ResponseStatus(BAD_REQUEST)
     public ProblemDetail handleServletRequestBindingException(ServletRequestBindingException exception) {
@@ -87,7 +96,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ProblemDetail handleHttpRequestMethodNotSupportedException(Exception exception) {
+    public ProblemDetail handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
 
         return problemBuilder
                 .buildGenericProblemDetail(
