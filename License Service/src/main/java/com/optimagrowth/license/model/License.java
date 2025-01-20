@@ -3,7 +3,6 @@ package com.optimagrowth.license.model;
 import com.optimagrowth.license.define.LicenseType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;

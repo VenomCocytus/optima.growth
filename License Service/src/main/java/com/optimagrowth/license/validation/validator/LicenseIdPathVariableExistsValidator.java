@@ -1,7 +1,6 @@
 package com.optimagrowth.license.validation.validator;
 
 import com.optimagrowth.license.repository.LicenseRepository;
-import com.optimagrowth.license.validation.annotation.LicenseIdNotAlreadyExists;
 import com.optimagrowth.license.validation.annotation.LicenseIdPathVariableExists;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
