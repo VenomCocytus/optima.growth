@@ -1,7 +1,7 @@
 spring:
-#  mvc:
-#    problemdetails:
-#      enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
 
   application:
     name: Licensing-service

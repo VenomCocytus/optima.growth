@@ -6,11 +6,12 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.optimagrowth.commonlibrary.api.component.ProblemBuilder;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.ClientAbortException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.lang.NonNullApi;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,12 +20,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.annotation.Nullable;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
 
 import static com.optimagrowth.commonlibrary.utils.utils.Utils.getStackTraceAsString;
+import static com.optimagrowth.commonlibrary.utils.utils.Utils.translate;
 import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
@@ -32,10 +37,11 @@ import static org.springframework.http.HttpStatus.*;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ProblemBuilder problemBuilder;
+    private final Map<String, List<String>> errorMessagesMap = new HashMap<>();
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleThrowableException(Throwable throwable) {
+    public ProblemDetail handleThrowable(Throwable throwable) {
 
         /*
             Handle specific exception for closed socket
@@ -51,7 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleRuntimeException(String errorMessage) {
+    public ProblemDetail handleRuntime(String errorMessage) {
 
         return problemBuilder
                 .buildRuntimeProblemDetail(
@@ -67,47 +73,62 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         getStackTraceAsString(exception), exception.getMessage(), INTERNAL_SERVER_ERROR);
     }
 
+    @Override
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException exception,
+                                                               HttpHeaders headers,
+                                                               HttpStatusCode statusCode,
+                                                               WebRequest request) {
 
-        return problemBuilder
-                .buildRuntimeProblemDetail(
-                        exception.getMessage(), BAD_REQUEST);
+        ProblemDetail problemDetail = problemBuilder
+                .buildGenericProblemDetail(
+                        exception.getLocalizedMessage(), exception.getMessage(), BAD_REQUEST);
+        return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
     }
 
+    @Override
     @ExceptionHandler(ServletRequestBindingException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ProblemDetail handleServletRequestBindingException(ServletRequestBindingException exception) {
+    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException exception,
+                                                                       HttpHeaders headers,
+                                                                       HttpStatusCode statusCode,
+                                                                       WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        getStackTraceAsString(exception), exception.getMessage(), BAD_REQUEST);
+                        getStackTraceAsString(exception), exception.getLocalizedMessage(), BAD_REQUEST);
+        return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
     }
 
     @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ProblemDetail handleUnauthorized(HttpClientErrorException.Unauthorized exception) {
+    public ProblemDetail handleUnauthorizedException(HttpClientErrorException.Unauthorized exception) {
 
         return problemBuilder
                 .buildGenericProblemDetail(
-                        getStackTraceAsString(exception), exception.getMessage(), UNAUTHORIZED);
+                        getStackTraceAsString(exception), exception.getLocalizedMessage(), UNAUTHORIZED);
     }
 
+    @Override
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ProblemDetail handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException exception,
+                                                                         HttpHeaders headers,
+                                                                      HttpStatusCode statusCode,
+                                                                      WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        exception.getMessage(), METHOD_NOT_ALLOWED);
+                        exception.getLocalizedMessage(), METHOD_NOT_ALLOWED);
+
+        return handleExceptionInternal(exception, problemDetail, headers, METHOD_NOT_ALLOWED, request);
     }
 
+    @Override
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-
-        Map<String, List<String>> errorMessagesMap = new HashMap<>();
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+                                                                      HttpHeaders headers,
+                                                                      HttpStatusCode statusCode,
+                                                                      WebRequest request) {
 
         exception.getBindingResult()
                 .getAllErrors()
@@ -127,10 +148,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        BAD_REQUEST, errorMessagesMap);
+                        exception.getLocalizedMessage(), BAD_REQUEST, errorMessagesMap);
         problemDetail.setInstance(exception.getBody().getInstance());
 
-        return problemDetail;
+        return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
+    }
+
+    @Override
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException exception,
+                                                                     HttpHeaders headers,
+                                                                     HttpStatusCode statusCode,
+                                                                     WebRequest request) {
+        ProblemDetail problemDetail = problemBuilder
+                .buildGenericProblemDetail(
+                        exception.getLocalizedMessage(),
+                        translate("exception.missing.servlet.request.part",
+                                exception.getRequestPartName()),
+                        BAD_REQUEST);
+
+        return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -138,7 +175,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception) {
 
         Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        Map<String, List<String>> errorMessagesMap = new HashMap<>();
 
         constraintViolations.forEach((constraintViolation -> {
             String fieldName =  String.format("%s", constraintViolation.getPropertyPath());
@@ -149,7 +185,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildGenericProblemDetail(
-                        BAD_REQUEST, errorMessagesMap);
+                        exception.getLocalizedMessage(), BAD_REQUEST, errorMessagesMap);
     }
 
     @ExceptionHandler(JoranException.class)
@@ -158,7 +194,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildGenericProblemDetail(
-                        exception.getMessage(), UNPROCESSABLE_ENTITY);
+                        exception.getLocalizedMessage(), UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -167,7 +203,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildGenericProblemDetail(
-                        exception.getMessage(), FORBIDDEN);
+                        exception.getLocalizedMessage(), FORBIDDEN);
     }
 
     @ExceptionHandler({JsonProcessingException.class, JsonPatchException.class})
@@ -176,6 +212,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildRuntimeProblemDetail(
-                        exception.getMessage(), BAD_REQUEST);
+                        exception.getLocalizedMessage(), BAD_REQUEST);
     }
 }

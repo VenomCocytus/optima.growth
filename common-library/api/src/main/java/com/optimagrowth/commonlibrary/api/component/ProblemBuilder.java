@@ -64,14 +64,14 @@ public class ProblemBuilder {
         return createProblemDetail(title, detail, httpStatus, GENERIC);
     }
 
-    public ProblemDetail buildGenericProblemDetail(HttpStatus httpStatus, Map<String, List<String>> errorMessagesMap) {
+    public ProblemDetail buildGenericProblemDetail(String title, HttpStatus httpStatus, Map<String, List<String>> errorMessagesMap) {
 
         String errorUri = String.format(
                 "https://%s:%s/errors/%s", applicationName, serverPort, httpStatus.name());
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(httpStatus);
         problemDetail.setType(URI.create(errorUri));
-        problemDetail.setTitle(translate("exception.generic.title"));
+        problemDetail.setTitle(title);
         problemDetail.setProperty(DETAIL, errorMessagesMap);
         problemDetail.setProperty(TIMESTAMP, Instant.now());
         problemDetail.setProperty(ERROR_CATEGORY, GENERIC);
