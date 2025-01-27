@@ -3,7 +3,6 @@ package com.optimagrowth.license.service.query.impl;
 import com.optimagrowth.license.dto.query.response.GetLicenseResponse;
 import com.optimagrowth.license.exception.runtine.LicenseNotFoundException;
 import com.optimagrowth.license.mapper.LicenseMapper;
-import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.repository.LicenseRepository;
 import com.optimagrowth.license.service.query.LicenseQueryService;
 import lombok.RequiredArgsConstructor;
