@@ -7,8 +7,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
-import static com.optimagrowth.commonlibrary.utils.utils.Utils.translate;
-
 @RequiredArgsConstructor
 public class LicenseIdPathVariableExistsValidator implements ConstraintValidator<LicenseIdPathVariableExists, String> {
 
