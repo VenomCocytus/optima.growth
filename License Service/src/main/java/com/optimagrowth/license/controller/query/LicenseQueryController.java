@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.optimagrowth.commonlibrary.utils.utils.Utils.translate;
 
 @RestController
@@ -32,5 +34,17 @@ public class LicenseQueryController {
                 .body(GenericResponse.success(
                         licenseQueryService.retrieveLicense(licenseId, organizationId),
                         translate("success.license.retrieved.successfully")));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<GenericResponse<List<GetLicenseResponse>>> retrieveAllLicenses(
+            @PathVariable
+            String organizationId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(GenericResponse.success(
+                        licenseQueryService.retrieveAllLicenses(organizationId),
+                        translate("success.licenses.retrieved.successfully")));
     }
 }
