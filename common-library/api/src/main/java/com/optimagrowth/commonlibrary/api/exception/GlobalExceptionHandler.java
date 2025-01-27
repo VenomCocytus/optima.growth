@@ -41,7 +41,6 @@ import static org.springframework.http.HttpStatus.*;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ProblemBuilder problemBuilder;
-    private final Map<String, List<String>> errorMessagesMap = new HashMap<>();
 
     /**
      * Handles {@link HttpMessageNotReadableException}, which occurs when the body of an HTTP request cannot be read or parsed.
@@ -85,7 +84,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        getStackTraceAsString(exception), exception.getLocalizedMessage(), BAD_REQUEST);
+                        exception.getLocalizedMessage(), getStackTraceAsString(exception), BAD_REQUEST);
         return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
     }
 
@@ -103,7 +102,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildGenericProblemDetail(
-                        getStackTraceAsString(exception), exception.getLocalizedMessage(), UNAUTHORIZED);
+                        exception.getLocalizedMessage(), getStackTraceAsString(exception), UNAUTHORIZED);
     }
 
     /**
@@ -187,6 +186,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                       HttpStatusCode statusCode,
                                                                       WebRequest request) {
 
+        Map<String, List<String>> errorMessagesMap = new HashMap<>();
         exception.getBindingResult()
                 .getAllErrors()
                 .forEach((error) -> {
@@ -205,7 +205,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        exception.getLocalizedMessage(), BAD_REQUEST, errorMessagesMap);
+                        translate("exception.method.argument.not.valid"), BAD_REQUEST, errorMessagesMap);
         problemDetail.setInstance(exception.getBody().getInstance());
 
         return handleExceptionInternal(exception, problemDetail, headers, BAD_REQUEST, request);
@@ -341,14 +341,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * This method constructs a {@link ProblemDetail} object to encapsulate error information and returns it with a 400 status code.
      *
      * @param exception The exception that was thrown due to constraint violations.
+     * @param request The current web request.
      *
      * @return A {@link ProblemDetail} object containing details about the constraint violations.
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
-    public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException exception,
+                                                            WebRequest request) {
 
         Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        Map<String, List<String>> errorMessagesMap = new HashMap<>();
 
         constraintViolations.forEach((constraintViolation -> {
             String fieldName =  String.format("%s", constraintViolation.getPropertyPath());
@@ -357,9 +360,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     fieldName, k -> new ArrayList<>()).add(errorMessage);
         }));
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
-                        exception.getLocalizedMessage(), BAD_REQUEST, errorMessagesMap);
+                        translate("exception.method.argument.not.valid"), BAD_REQUEST, errorMessagesMap);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), BAD_REQUEST, request);
     }
 
     /**
@@ -437,22 +442,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         throwable.getMessage(), INTERNAL_SERVER_ERROR, false);
     }
 
-    /**
-     * Handles any uncaught {@link RuntimeException} instances, providing a generic error handling mechanism for unexpected runtime errors.
-     * This method constructs a {@link ProblemDetail} object to encapsulate error information and returns it with a 500 status code.
-     *
-     * @param errorMessage The message that will be thrown.
-     *
-     * @return A {@link ProblemDetail} object containing details about the runtime error.
-     */
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleRuntime(String errorMessage) {
-
-        return problemBuilder
-                .buildRuntimeProblemDetail(
-                        errorMessage, INTERNAL_SERVER_ERROR);
-    }
+//    /**
+//     * Handles any uncaught {@link RuntimeException} instances, providing a generic error handling mechanism for unexpected runtime errors.
+//     * This method constructs a {@link ProblemDetail} object to encapsulate error information and returns it with a 500 status code.
+//     *
+//     * @param errorMessage The message that will be thrown.
+//     *
+//     * @return A {@link ProblemDetail} object containing details about the runtime error.
+//     */
+//    @ExceptionHandler(RuntimeException.class)
+//    @ResponseStatus(INTERNAL_SERVER_ERROR)
+//    public ProblemDetail handleRuntime(String errorMessage) {
+//
+//        return problemBuilder
+//                .buildRuntimeProblemDetail(
+//                        errorMessage, INTERNAL_SERVER_ERROR);
+//    }
 
     /**
      * Handles any uncaught {@link Exception} instances, providing a generic error handling mechanism for unexpected server-side errors.
@@ -468,6 +473,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemBuilder
                 .buildRuntimeProblemDetail(
-                        getStackTraceAsString(exception), exception.getLocalizedMessage(), INTERNAL_SERVER_ERROR);
+                        exception.getLocalizedMessage(), getStackTraceAsString(exception), INTERNAL_SERVER_ERROR);
     }
 }

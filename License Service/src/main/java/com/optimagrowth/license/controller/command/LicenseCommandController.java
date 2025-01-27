@@ -50,6 +50,7 @@ public class LicenseCommandController {
             String licenseId,
             @PathVariable
             String organizationId,
+            @RequestBody
             JsonPatch jsonPatch)
             throws JsonPatchException, LicenseNotFoundException, JsonProcessingException {
 
@@ -71,7 +72,7 @@ public class LicenseCommandController {
         licenseCommandService.deleteLicense(licenseId, organizationId);
 
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.ACCEPTED)
                 .body(GenericResponse.success(
                         translate("success.license.deleted.successfully")
                 ));

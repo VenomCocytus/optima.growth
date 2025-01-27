@@ -7,9 +7,9 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {LicenseIdPathVariableExistsValidator.class})
+@Constraint(validatedBy = { LicenseIdPathVariableExistsValidator.class })
 public @interface LicenseIdPathVariableExists {
 
     String message() default "{default.license.id.path.invalid}";

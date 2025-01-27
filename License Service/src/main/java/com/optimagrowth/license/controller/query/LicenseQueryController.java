@@ -5,15 +5,22 @@ import com.optimagrowth.license.dto.query.response.GetLicenseResponse;
 import com.optimagrowth.license.exception.runtine.LicenseNotFoundException;
 import com.optimagrowth.license.service.query.LicenseQueryService;
 import com.optimagrowth.license.validation.annotation.LicenseIdPathVariableExists;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.optimagrowth.commonlibrary.utils.utils.Utils.translate;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/organization/{organizationId}/license")
