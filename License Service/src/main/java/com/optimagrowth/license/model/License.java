@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(value = "license")
-public class License extends BaseModel{
+public class License extends BaseModel {
 
     @Indexed(unique = true)
     @NotBlank(message = "{message.license.id.blank}")

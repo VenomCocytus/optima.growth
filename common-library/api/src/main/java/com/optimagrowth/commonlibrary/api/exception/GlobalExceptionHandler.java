@@ -96,13 +96,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      *
      * @return A {@link ProblemDetail} object containing detailed error information, including the stack trace and localized message.
      */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
-    public ProblemDetail handleUnauthorizedException(HttpClientErrorException.Unauthorized exception) {
+    public ResponseEntity<Object> handleUnauthorizedException(HttpClientErrorException.Unauthorized exception, WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
                         exception.getLocalizedMessage(), getStackTraceAsString(exception), UNAUTHORIZED);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), UNAUTHORIZED, request);
     }
 
     /**
@@ -324,16 +325,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      *
      * @return A {@link ProblemDetail} object containing details about the type mismatch.
      */
-    @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ProblemDetail handleMethodArgumentMismatch(MethodArgumentTypeMismatchException exception) {
+    public ResponseEntity<Object> handleMethodArgumentMismatch(MethodArgumentTypeMismatchException exception, WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
                         exception.getLocalizedMessage(),
                         translate("exception.method.argument.type.mismatch",
                                 exception.getName(), exception.getRequiredType().getName()),
                         BAD_REQUEST);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), BAD_REQUEST, request);
     }
 
     /**
@@ -376,12 +378,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return A {@link ProblemDetail} object containing details about the Joran exception.
      */
     @ExceptionHandler(JoranException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ProblemDetail handleJoranException(JoranException exception) {
+    public ResponseEntity<Object> handleJoranException(JoranException exception, WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
                         exception.getLocalizedMessage(), UNPROCESSABLE_ENTITY);
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), UNPROCESSABLE_ENTITY, request);
     }
 
     /**
@@ -393,12 +395,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return A {@link ProblemDetail} object containing details about the access denial.
      */
     @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(FORBIDDEN)
-    public ProblemDetail handleAccessDeniedException(AccessDeniedException exception) {
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException exception, WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildGenericProblemDetail(
                         exception.getLocalizedMessage(), FORBIDDEN);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), FORBIDDEN, request);
     }
 
     /**
@@ -410,12 +413,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return A {@link ProblemDetail} object containing details about the JSON processing error.
      */
     @ExceptionHandler({JsonProcessingException.class, JsonPatchException.class})
-    @ResponseStatus(BAD_REQUEST)
-    public ProblemDetail handleJsonProcessingException(Exception exception) {
+    public ResponseEntity<Object> handleJsonProcessingException(Exception exception, WebRequest request) {
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildRuntimeProblemDetail(
                         exception.getLocalizedMessage(), BAD_REQUEST);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), BAD_REQUEST, request);
     }
 
     /**
@@ -427,37 +431,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return A {@link ProblemDetail} object containing details about the server error.
      */
     @ExceptionHandler(Throwable.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleThrowable(Throwable throwable) {
+    public ResponseEntity<Object> handleThrowable(Throwable throwable, WebRequest request) {
 
         /*
             Handle specific exception for closed socket
             When closed no response can be returned
         */
         if(throwable instanceof ClientAbortException)
-            return ProblemDetail.forStatus(INTERNAL_SERVER_ERROR);
+            return createResponseEntity(
+                    ProblemDetail.forStatus(INTERNAL_SERVER_ERROR), new HttpHeaders(), INTERNAL_SERVER_ERROR, request);
 
-        return problemBuilder
+        ProblemDetail problemDetail = problemBuilder
                 .buildProblemDetail(
                         throwable.getMessage(), INTERNAL_SERVER_ERROR, false);
-    }
 
-//    /**
-//     * Handles any uncaught {@link RuntimeException} instances, providing a generic error handling mechanism for unexpected runtime errors.
-//     * This method constructs a {@link ProblemDetail} object to encapsulate error information and returns it with a 500 status code.
-//     *
-//     * @param errorMessage The message that will be thrown.
-//     *
-//     * @return A {@link ProblemDetail} object containing details about the runtime error.
-//     */
-//    @ExceptionHandler(RuntimeException.class)
-//    @ResponseStatus(INTERNAL_SERVER_ERROR)
-//    public ProblemDetail handleRuntime(String errorMessage) {
-//
-//        return problemBuilder
-//                .buildRuntimeProblemDetail(
-//                        errorMessage, INTERNAL_SERVER_ERROR);
-//    }
+        return createResponseEntity(
+                problemDetail, new HttpHeaders(), INTERNAL_SERVER_ERROR, request);
+    }
 
     /**
      * Handles any uncaught {@link Exception} instances, providing a generic error handling mechanism for unexpected server-side errors.
@@ -474,5 +464,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemBuilder
                 .buildRuntimeProblemDetail(
                         exception.getLocalizedMessage(), getStackTraceAsString(exception), INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles internal server errors by catching specific runtime exceptions and returning a standardized error response.
+     *
+     * @param exception The runtime exception that occurred, which can be one of the following:
+     *                  <ul>
+     *                      <li>{@link NullPointerException} - Thrown when an application attempts to use an object reference that has a null value.</li>
+     *                      <li>{@link IllegalArgumentException} - Thrown to indicate that a method has been passed an argument that is not valid for that method.</li>
+     *                      <li>{@link IllegalStateException} - Thrown when a method is invoked at an inappropriate time.</li>
+     *                  </ul>
+     * @param request The current web request.
+     *
+     * @return A {@link ResponseEntity} containing a {@link ProblemDetail} object that describes the error, along with an HTTP status code indicating an internal server error (500).
+     *
+     * @see #handleExceptionInternal(Exception, Object, HttpHeaders, HttpStatus, WebRequest)
+     * @see ProblemDetail
+     */
+    @ExceptionHandler({
+            NullPointerException.class,
+            IllegalArgumentException.class,
+            IllegalStateException.class
+    })
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Object> handleInternal(RuntimeException exception, WebRequest request) {
+
+        ProblemDetail problemDetail = problemBuilder
+                .buildRuntimeProblemDetail(
+                        exception.getLocalizedMessage(), getStackTraceAsString(exception), INTERNAL_SERVER_ERROR);
+
+        return handleExceptionInternal(exception, problemDetail, new HttpHeaders(), INTERNAL_SERVER_ERROR, request);
     }
 }

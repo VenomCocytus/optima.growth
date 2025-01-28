@@ -1,5 +1,6 @@
 package com.optimagrowth.commonlibrary.core.config;
 
+import io.micrometer.common.lang.NonNullApi;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 import java.util.TimeZone;
 
-
+@NonNullApi
 @Configuration
 public class LocaleResolverConfig implements WebMvcConfigurer {
 
@@ -28,9 +29,10 @@ public class LocaleResolverConfig implements WebMvcConfigurer {
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource resourceBundleMessageSource =  new ResourceBundleMessageSource();
+        resourceBundleMessageSource.setUseCodeAsDefaultMessage(true);
         resourceBundleMessageSource.setAlwaysUseMessageFormat(true);
-        resourceBundleMessageSource.setBasename("messages");
         resourceBundleMessageSource.setDefaultEncoding("UTF-8");
+        resourceBundleMessageSource.setBasename("messages");
         resourceBundleMessageSource.setCacheSeconds(5);
 
         return resourceBundleMessageSource;
@@ -72,7 +74,7 @@ public class LocaleResolverConfig implements WebMvcConfigurer {
      * Add an interceptor bean that will switch to a new locale based on the value of the "lang" query
      * string parameter appended to a request.
      * Eg: /entities/27?lang=pl
-     * Note: In order to take effect, this bean needs to be added to the application's interceptor
+     * Note: To take effect, this bean needs to be added to the application's interceptor
      * registry
      *
      * @return -
