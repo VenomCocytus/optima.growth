@@ -10,5 +10,32 @@ spring:
     mongodb:
       uri: mongodb://root:password@localhost:27017/licensing-service?authSource=admin
 
+management:
+  health:
+    diskspace:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      access: read_only
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+      discovery:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    key-values:
+      application: Licensing-service
+
 server:
   port: 8081

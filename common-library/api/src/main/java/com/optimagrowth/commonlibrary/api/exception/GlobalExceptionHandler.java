@@ -479,7 +479,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      *
      * @return A {@link ResponseEntity} containing a {@link ProblemDetail} object that describes the error, along with an HTTP status code indicating an internal server error (500).
      *
-     * @see #handleExceptionInternal(Exception, Object, HttpHeaders, HttpStatus, WebRequest)
      * @see ProblemDetail
      */
     @ExceptionHandler({
