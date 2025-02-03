@@ -2,21 +2,27 @@ package com.optimagrowth.license.dto.query.response;
 
 import com.optimagrowth.license.define.LicenseType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
-public record GetLicenseResponse(
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class GetLicenseResponse extends RepresentationModel<GetLicenseResponse> {
         @NotBlank(message = "{message.id.blank}")
-        String id,
+        private String id;
         @NotBlank(message = "{message.license.id.blank}")
-        String licenseId,
+        private String licenseId;
         @NotBlank(message = "{The license description cannot be blank}")
-        String description,
+        private String description;
         @NotBlank(message = "{message.license.organization.id.blank}")
-        String organizationId,
+        private String organizationId;
         @NotBlank(message = "{message.license.product.name.blank}")
-        String productName,
-        @NotBlank(message = "{message.license.type.blank}")
-        @Pattern(regexp = "FULL|PARTIAL" ,message = "{message.license.type.not.valid.alert}")
-        LicenseType licenseType
-) {
+        private String productName;
+        @NotNull(message = "{message.license.type.null}")
+        private LicenseType licenseType;
 }
