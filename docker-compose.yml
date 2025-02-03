@@ -1,12 +1,28 @@
+version: '3.8'
+
 services:
   mongodb:
-    image: mongo:7.0.5
-    container_name: mongodb-optima-growth
+    image: mongo:latest
+    container_name: mongodb-optima
     ports:
-      - 27017:27017
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: licensing-service
     volumes:
       - ../databases/mongodb-licensing-service:/data/db
+
+  licensing-service:
+    container_name: licensing-service
+    build:
+      context: .\License Service
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: target/licensing-service-0.0.1-SNAPSHOT.jar
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:password@mongodb:27017/licensing-service?authSource=admin
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb

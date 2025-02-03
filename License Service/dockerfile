@@ -1,5 +1,0 @@
-FROM alpine:3.21
-MAINTAINER Allan Elong <venomcocytus-github-io.pages.dev>
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]

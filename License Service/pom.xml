@@ -19,7 +19,7 @@
     <properties>
         <java.version>21</java.version>
         <mapstruct.version>1.6.2</mapstruct.version>
-        <docker.image.prefix>optimaGrowth</docker.image.prefix>
+        <docker.image.prefix>optima.growth</docker.image.prefix>
     </properties>
 
     <dependencies>
