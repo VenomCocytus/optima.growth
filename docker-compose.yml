@@ -12,6 +12,20 @@ services:
       MONGO_INITDB_DATABASE: licensing-service
     volumes:
       - ../databases/mongodb-licensing-service:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "127.0.0.1/test",
+          "--eval",
+          "'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   licensing-service:
     container_name: licensing-service
@@ -25,4 +39,5 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
