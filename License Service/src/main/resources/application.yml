@@ -6,15 +6,18 @@ spring:
   application:
     name: Licensing-service
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   data:
     mongodb:
-#      uri: mongodb://root:password@localhost:27017/licensing-service?authSource=admin
-      host: localhost
-      database: licensing-service
-      port: 27017
-      username: root
-      password: password
-      authentication-database: admin
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://root:password@localhost:27017/licensing-service?authSource=admin}
+#      host: localhost
+#      database: licensing-service
+#      port: 27017
+#      username: root
+#      password: password
+#      authentication-database: admin
 
 management:
   health:
@@ -27,7 +30,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, prometheus
+#        include: health, info, metrics, prometheus
+        include: "*"
       discovery:
         enabled: true
   metrics:

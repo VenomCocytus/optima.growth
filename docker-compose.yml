@@ -36,6 +36,7 @@ services:
         JAR_FILE: target/licensing-service-0.0.1-SNAPSHOT.jar
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:password@mongodb:27017/licensing-service?authSource=admin
+      SPRING_PROFILES_ACTIVE: "dev"
     ports:
       - "8081:8081"
     depends_on:

@@ -37,4 +37,7 @@ public class License extends BaseModel {
 
     @NotNull(message = "{message.license.type.null}")
     private LicenseType licenseType;
+
+    @Size(min = 3, max = 50, message = "{message.license.comment.size.alert}")
+    private String comment;
 }
