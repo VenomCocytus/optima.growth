@@ -5,8 +5,8 @@ spring:
   profiles:
     active: dev
 
-  cloud:
-    config:
-      uri: http://configserver:8071
+  config:
+    import: optional:config-server:http://localhost:8071
+
 server:
   port: 8081
