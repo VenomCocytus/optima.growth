@@ -1,0 +1,29 @@
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+
+management:
+  health:
+    diskspace:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      access: read_only
+  endpoints:
+    web:
+      exposure:
+        #include: health, info, metrics, prometheus
+        include: "*"
+      discovery:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  tracing:
+    sampling:
+      probability: 1.0

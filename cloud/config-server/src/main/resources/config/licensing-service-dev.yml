@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://root:password@localhost:27017/licensing-service?authSource=admin
+    #      host: localhost
+    #      database: licensing-service
+    #      port: 27017
+    #      username: root
+    #      password: password
+    #      authentication-database: admin

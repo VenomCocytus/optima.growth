@@ -1,5 +1,32 @@
+server:
+  port: 8071
+
 spring:
   application:
     name: config-server
-server:
-  port: 8071
+
+  profiles:
+    active:
+      - native
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/
+#        git:
+#          uri: https://github.com/your-github-username/your-config-repo.git
+#          username: admin
+#          password: admin
+#          clone-on-start: true
+#          force-pull: true
+#          timeout: 5
+#          search-paths: licensing-service
+#        bootstrap: true
+
+# Enable all spring boot actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
