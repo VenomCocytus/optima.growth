@@ -27,6 +27,21 @@ services:
       retries: 5
       start_period: 10s
 
+  config-server:
+    container_name: config-server
+    build:
+      context: .\cloud\config-server
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: target/licensing-service-0.0.1-SNAPSHOT.jar
+    ports:
+      - "8071:8071"
+    environment:
+      ENCRYPT_KEY: "fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo"
+      SPRING_DATA_MONGODB_URI: mongodb://root:password@mongodb:27017/licensing-service?authSource=admin
+      SPRING_PROFILES_ACTIVE: dev
+
+
   licensing-service:
     container_name: licensing-service
     build:
@@ -34,11 +49,13 @@ services:
       dockerfile: Dockerfile
       args:
         JAR_FILE: target/licensing-service-0.0.1-SNAPSHOT.jar
+    ports:
+      - "8081:8081"
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:password@mongodb:27017/licensing-service?authSource=admin
       SPRING_PROFILES_ACTIVE: dev
-    ports:
-      - "8081:8081"
     depends_on:
+      config-server:
+        condition: service_started
       mongodb:
         condition: service_healthy

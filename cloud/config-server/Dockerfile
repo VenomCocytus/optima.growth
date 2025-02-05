@@ -1,20 +1,3 @@
-##### Base dockerfile config #####
-
-## Start with a base image containing Java Runtime
-#FROM amazoncorretto:22
-#
-## Add maintainer info
-#LABEL maintainer="Allan Elong <venomcocytus-github-io.pages.dev>"
-#
-## The application Jar file
-#ARG JAR_FILE
-#
-## Add the application 's jar file to the containter
-#COPY ${JAR_FILE} app.jar
-#
-## Execute the application
-#ENTRYPOINT ["java", "-jar", "/app.jar"]
-
 ##### Multistage config #####
 
 # Stage 1
@@ -47,4 +30,4 @@ COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
 #execute the application
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.optimagrowth.license.LicenseServiceApplication"]
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.optimagrowth.license.ConfigServerApplication"]
