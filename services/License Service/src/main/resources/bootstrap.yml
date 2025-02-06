@@ -6,7 +6,7 @@ spring:
     active: dev
 
   config:
-    import: optional:config-server:http://localhost:8071
+    import: ${CONFIG_SERVER_URL:optional:config-server:http://localhost:8071}
 
 server:
   port: 8081
