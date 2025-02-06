@@ -5,12 +5,12 @@ spring:
   profiles:
     active: dev
 
-#  cloud:
-#    config:
-#      uri: http://admin:admin-password@configserver:8071
+  cloud:
+    config:
+      uri: http://admin:admin-password@localhost:8071
 
-  config:
-    import: optional:configserver:http://admin:admin-password@localhost:8071
+#  config:
+#    import: optional:configserver:http://admin:admin-password@localhost:8071
 
 server:
   port: 8081
