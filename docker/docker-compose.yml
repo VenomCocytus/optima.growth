@@ -9,7 +9,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: licensing-service
     volumes:
-      - ../databases/mongodb-licensing-service:/data/db
+      - ../../databases/mongodb-licensing-service:/data/db
     healthcheck:
       test:
         [
@@ -28,7 +28,7 @@ services:
   config-server:
     container_name: config-server
     build:
-      context: .\cloud\config-server
+      context: ..\cloud\config-server
       dockerfile: Dockerfile
       args:
         JAR_FILE: target/config-server-0.0.1-SNAPSHOT.jar
@@ -42,7 +42,7 @@ services:
   licensing-service:
     container_name: licensing-service
     build:
-      context: .\services\License Service
+      context: ..\services\License Service
       dockerfile: Dockerfile
       args:
         JAR_FILE: target/licensing-service-0.0.1-SNAPSHOT.jar
