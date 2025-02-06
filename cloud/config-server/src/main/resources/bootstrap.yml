@@ -3,7 +3,8 @@ spring:
     name: config-server
 
   profiles:
-    active: native
+    active:
+      - native, git
 
   security:
     user:
@@ -15,14 +16,18 @@ spring:
       server:
         native:
           search-locations: classpath:/config/
-#        git:
-#          uri: https://github.com/your-github-username/your-config-repo.git
+        git:
+          uri: https://github.com/VenomCocytus/srping-cloud-config-server-repository.git
 #          username: admin
 #          password: admin
-#          clone-on-start: true
-#          force-pull: true
-#          timeout: 5
-#          search-paths: licensing-service
+          clone-on-start: true
+          force-pull: true
+          timeout: 5
+          search-paths: optima-growth
+        bootstrap: true
+
+encrypt:
+  key: fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo
 
 server:
   port: 8071
