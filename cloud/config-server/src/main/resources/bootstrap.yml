@@ -1,13 +1,14 @@
-server:
-  port: 8071
-
 spring:
   application:
     name: config-server
 
   profiles:
-    active:
-      - native
+    active: native
+
+  security:
+    user:
+      name: admin
+      password: admin-password
 
   cloud:
     config:
@@ -22,7 +23,9 @@ spring:
 #          force-pull: true
 #          timeout: 5
 #          search-paths: licensing-service
-#        bootstrap: true
+
+server:
+  port: 8071
 
 # Enable all spring boot actuator endpoints
 management:
