@@ -1,9 +1,9 @@
 spring:
   data:
     mongodb:
-      database: licensing-service
-      port: 27017
-      authentication-database: admin
+      database: "{cipher}67b08df786f339a7ec3eeb718f1f481e6886de0fc16a3839c5d689456b02af2139bd804c2c425b04e677adcb41424679"
+      port: "{cipher}f1352e55a6fc84a0ae1a1aa1b7bba6fcdbe5e49b4510ebf24423ec89c34f905f"
+      authentication-database: "{cipher}afa11de7efd87a7aaf2d97a1101e0722e2891898bb17513c2aa920667167806b"
 
 management:
   observations:

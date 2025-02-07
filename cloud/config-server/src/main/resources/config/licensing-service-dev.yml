@@ -3,5 +3,5 @@ spring:
     mongodb:
 #      uri: ${SPRING_DATA_MONGODB_URI:mongodb://root:password@localhost:27017/licensing-service?authSource=admin}
       host: localhost
-      username: root
-      password: password
+      username: "{cipher}ebb05db45c05fab6e272689c2dc283cba7335cb655073a1d7ee1ecb5fbc7570f"
+      password: "{cipher}1309a359f52cfe185bec59babc094d2290bbb1c7b28e1be382bbb1fb0af76e9c"
