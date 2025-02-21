@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: discovery-server
+
+  cloud:
+    config:
+      uri: http://admin:admin-password@localhost:8071
+
+  security:
+    user:
+      name: admin
+      password: admin-password

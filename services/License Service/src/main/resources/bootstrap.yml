@@ -11,6 +11,3 @@ spring:
 
 #  config:
 #    import: optional:configserver:http://admin:admin-password@localhost:8071
-
-server:
-  port: 8081

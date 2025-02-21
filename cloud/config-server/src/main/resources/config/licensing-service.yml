@@ -9,3 +9,6 @@ management:
   observations:
     key-values:
       application: licensing-service
+
+server:
+  port: 8081
