@@ -25,6 +25,7 @@ services:
       retries: 5
       start_period: 10s
 
+
   config-server:
     container_name: config-server
     build:
@@ -37,6 +38,22 @@ services:
     environment:
       ENCRYPT_KEY: "fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo"
       SPRING_PROFILES_ACTIVE: native
+
+
+  discovery-server:
+    container_name: discovery-server
+    build:
+      context: ..\cloud\discovery-server
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: target/discovery-server-0.0.1-SNAPSHOT.jar
+    ports:
+      - 8070:8070
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
 
 
   licensing-service:
@@ -54,6 +71,8 @@ services:
       SPRING_CLOUD_CONFIG_URI: http://admin:admin-password@config-server:8071
     depends_on:
       config-server:
+        condition: service_started
+      discovery-server:
         condition: service_started
       mongodb:
         condition: service_healthy
