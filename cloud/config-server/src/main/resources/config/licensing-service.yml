@@ -5,6 +5,15 @@ spring:
       port: "{cipher}f1352e55a6fc84a0ae1a1aa1b7bba6fcdbe5e49b4510ebf24423ec89c34f905f"
       authentication-database: "{cipher}afa11de7efd87a7aaf2d97a1101e0722e2891898bb17513c2aa920667167806b"
 
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka
+
 management:
   observations:
     key-values:
@@ -12,12 +21,3 @@ management:
 
 server:
   port: 8081
-
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://admin:admin-password@localhost:8070/eureka/
