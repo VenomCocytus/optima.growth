@@ -20,7 +20,6 @@
 
     <modules>
         <module>License Service</module>
-        <module>organization-service</module>
     </modules>
 
     <properties>
